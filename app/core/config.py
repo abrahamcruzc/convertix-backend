@@ -1,24 +1,26 @@
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, field_validator
+from pydantic import AnyHttpUrl, PostgresDsn, field_validator
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = os.getenv("SECRET_KEY", "SECRET_PASS")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8 # 8 días
-
-
-    #CORS
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    APP_NAME: str = os.getenv("APP_NAME", "convertix")
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    RABBITMQ_URL: str = os.getenv("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672//")
     
-    @field_validator("BACKEND_CORS_ORIGINS", pre=True)
+    #CORS
+    BACKEND_CORS_ORIGINS: List[str] = []
+    
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[list[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
         elif isinstance(v, (list, str)):
             return v
-        # Esta línea es alcanzable si v no es ni str ni list
         raise ValueError(f"BACKEND_CORS_ORIGINS debe ser una cadena o lista, recibido: {type(v)}")
 
     # Base de datos
@@ -28,17 +30,15 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "convertix")
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
-    @field_validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+    @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
+    def assemble_db_connection(cls, v: Optional[str], info) -> Any:
         if isinstance(v, str):
             return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
-        )
+        user = info.data.get("POSTGRES_USER")
+        password = info.data.get("POSTGRES_PASSWORD")
+        host = info.data.get("POSTGRES_SERVER")
+        db = info.data.get("POSTGRES_DB")
+        return f"postgresql://{user}:{password}@{host}/{db}"
 
     # Celery
     CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL", "amqp://guest:guest@localhost:5672//")

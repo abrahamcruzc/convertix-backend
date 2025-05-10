@@ -24,10 +24,10 @@ class Settings(BaseSettings):
         raise ValueError(f"BACKEND_CORS_ORIGINS debe ser una cadena o lista, recibido: {type(v)}")
 
     # Base de datos
-    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "localhost")
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "convertix")
+    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER")
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER")  
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")  
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB")
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
     @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")

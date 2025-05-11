@@ -50,7 +50,7 @@ class ImageOut(ImageBase):
     updated_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Updated from orm_mode = True
 
 # Modelo para solicitar una conversión
 class ConversionRequest(BaseModel):

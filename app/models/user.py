@@ -1,13 +1,19 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
 class User(Base):
+    __tablename__ = "users"
+
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
+    
+    images = relationship("Image", back_populates="owner")
     full_name = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
 
@@ -29,4 +35,4 @@ class UserOut(UserBase):
     id: int
 
     class Config:
-        from_attributes = True  
+        from_attributes = True

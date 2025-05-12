@@ -2,6 +2,7 @@ from PIL import Image
 import os
 from typing import Optional, Dict, Any
 from app.core.config import settings
+from app.core.logger import logger
 
 def process_image(
     input_path: str,
@@ -61,8 +62,6 @@ def process_image(
             )
             
             return True
-            
     except Exception as e:
-        # Aquí podrías agregar logging
-        print(f"Error al procesar la imagen: {str(e)}")
+        logger.error(f"Error procesando imagen: {str(e)}")
         return False

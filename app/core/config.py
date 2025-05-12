@@ -38,7 +38,24 @@ class Settings(BaseSettings):
         password = info.data.get("POSTGRES_PASSWORD")
         host = info.data.get("POSTGRES_SERVER")
         db = info.data.get("POSTGRES_DB")
-        return f"postgresql://{user}:{password}@{host}/{db}"
+        
+        if not all([user, host, db]):
+            return None
+            
+        if password:
+            return PostgresDsn.build(
+                scheme="postgresql",
+                username=user,
+                password=password,
+                host=host,
+                path=db  
+            )
+        return PostgresDsn.build(
+            scheme="postgresql",
+            username=user,
+            host=host,
+            path=db  
+        )
 
     # Celery
     CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL", "amqp://guest:guest@localhost:5672//")
@@ -50,7 +67,10 @@ class Settings(BaseSettings):
     
     # Configuración de procesamiento de imágenes
     MAX_IMAGE_SIZE: int = 10 * 1024 * 1024  # 10MB
-    ALLOWED_IMAGE_FORMATS: List[str] = ["jpg", "jpeg", "png", "gif", "webp"]
+    ALLOWED_IMAGE_FORMATS: List[str] = ["jpg", "jpeg", "png", "webp"]
+
+    # Server configuration
+    SERVER_HOST: str = os.getenv("SERVER_HOST", "http://localhost:8000")
 
     class Config:
         case_sensitive = True

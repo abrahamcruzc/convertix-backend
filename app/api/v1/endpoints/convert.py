@@ -7,6 +7,7 @@ from app.models.image import Image, ImageCreate, ImageOut, ConversionRequest
 from app.core.config import settings
 from app.services.image_processor import process_image
 from app.core.celery_app import celery_app
+from app.storage.local import storage
 
 router = APIRouter()
 
@@ -39,7 +40,7 @@ async def upload_image(
         "filename": file.filename,
         "format": format,
         "size": len(content),
-        "url": f"/storage/{file.filename}",  # URL temporal
+        "url": await storage.save_file(file, content),  
         "original_format": format
     }
     
@@ -47,9 +48,6 @@ async def upload_image(
     db.add(db_image)
     db.commit()
     db.refresh(db_image)
-    
-    # Guardar el archivo
-    # Aquí implementaremos el almacenamiento más adelante
     
     return db_image
 

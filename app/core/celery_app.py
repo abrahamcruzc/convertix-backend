@@ -9,7 +9,7 @@ celery_app = Celery(
 )
 
 celery_app.conf.task_routes = {
-    "app.tasks.convert_image.convert_image": "main-queue"  # Updated task name to match the function
+    "app.tasks.convert_image.convert_image": "main-queue"  
 }
 
 celery_app.conf.update(

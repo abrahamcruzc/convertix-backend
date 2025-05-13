@@ -51,7 +51,7 @@ async def upload_image(
     
     return db_image
 
-@router.post("/{image_id}/convert", response_model=ImageOut)  # Cambiado el orden de la ruta
+@router.post("/{image_id}/convert", response_model=ImageOut)  
 async def convert_image(
     image_id: int,
     conversion: ConversionRequest,

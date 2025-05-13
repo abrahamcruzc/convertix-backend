@@ -2,15 +2,20 @@ from celery import Celery
 from app.core.config import settings
 
 celery_app = Celery(
-    "convertix",
-    broker=settings.CELERY_BROKER_URL,
-    backend=settings.CELERY_RESULT_BACKEND
+    "worker",
+    broker="amqp://guest:guest@localhost:5672//",
+    backend=settings.CELERY_RESULT_BACKEND,
+    include=['app.tasks.convert_image']
 )
 
+celery_app.conf.task_routes = {
+    "app.tasks.convert_image.convert_image": "main-queue"  # Updated task name to match the function
+}
+
 celery_app.conf.update(
-    task_serializer="json",
-    accept_content=["json"],
-    result_serializer="json",
-    timezone="UTC",
+    task_serializer='json',
+    accept_content=['json'],
+    result_serializer='json',
+    timezone='UTC',
     enable_utc=True,
 )

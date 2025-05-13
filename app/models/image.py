@@ -58,7 +58,6 @@ class ImageOut(ImageBase):
 
 # Modelo para solicitar una conversión
 class ConversionRequest(BaseModel):
-    image_id: int
     target_format: str
     options: Optional[dict] = None
 

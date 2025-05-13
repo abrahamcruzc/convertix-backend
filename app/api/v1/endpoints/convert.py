@@ -51,7 +51,7 @@ async def upload_image(
     
     return db_image
 
-@router.post("/convert/{image_id}", response_model=ImageOut)
+@router.post("/{image_id}/convert", response_model=ImageOut)  
 async def convert_image(
     image_id: int,
     conversion: ConversionRequest,
@@ -78,10 +78,14 @@ async def convert_image(
     db.commit()
     
     # Iniciar tarea de conversión asíncrona
-    celery_app.send_task(
+    task = celery_app.send_task(
         "app.tasks.convert_image",
         args=[image_id, conversion.target_format, conversion.options]
     )
+    
+    # Guardar el ID de la tarea
+    image.task_id = task.id
+    db.commit()
     
     return image
 

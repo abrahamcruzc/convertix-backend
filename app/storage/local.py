@@ -18,7 +18,7 @@ class LocalStorage:
                 f.write(content)
             
             logger.info(f"Archivo guardado exitosamente: {file_path}")
-            return f"{settings.SERVER_HOST}/storage/{final_filename}"  # Use absolute URL
+            return f"{settings.SERVER_HOST}/storage/{final_filename}" 
             
         except Exception as e:
             logger.error(f"Error al guardar el archivo: {str(e)}")

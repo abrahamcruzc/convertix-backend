@@ -8,10 +8,8 @@ from app.db.init_db import init_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Código que se ejecuta al iniciar la aplicación
     init_db()
     yield
-    # Código que se ejecuta al cerrar la aplicación
 
 app = FastAPI(
     title=settings.APP_NAME,
